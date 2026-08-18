@@ -1,0 +1,10 @@
+
+
+Nodejs watch this video 5 intrview quetion 
+https://youtu.be/Ofn1du_mzRg?si=e4b2Pu0tDIsifwUk
+
+00:25 Q1: process.nextTick vs setImmediate vs setTimeout
+05:14 Q2: Cluster vs Worker Threads
+08:37 Q3: Module caching in Node.js
+10:14 Q4: Error handling in Node.js
+13:03 Q5: Event loop in browser vs Node.js
