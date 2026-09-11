@@ -1,3 +1,4 @@
+https://chatgpt.com/share/6a8a8462-3e84-83e9-8480-3b3e0e9b2538
 # 🎯 Accenture Node.js Mock Interview — Complete Session
 
 > **Interview Preparation Session**
@@ -1335,6 +1336,10 @@ Say:
 > "This can cause high CPU/I/O, contention, connection pressure, or long-running queries."
 
 This small change will make your answers sound much more **senior and production-oriented**.
+
+---
+## Promise.all() vs Promise.allSettled() vs Promise.race() vs Promise.any()
+[Link]https://dev.to/shameel/javascript-promise-all-vs-allsettled-and-race-vs-any-3foj 
 
 ---
 
