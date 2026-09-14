@@ -1,0 +1,39 @@
+op Frequently Asked Interview Questions on OAuth2 in Spring Boot
+
+Security is one of the most critical aspects of any Microservices or Web Application — and that’s where OAuth2 comes in.
+
+Q1. What is OAuth2?
+A. OAuth2 is an authorization framework that allows third-party applications to access user data without sharing login credentials.
+
+Q2. What are the main components of OAuth2?
+	•	Resource Owner: The user.
+	•	Client: The application requesting access.
+	•	Authorization Server: Issues access tokens.
+	•	Resource Server: Hosts the protected APIs.
+
+
+Q3. How is OAuth2 different from Authentication?
+A.
+	•	Authentication → Confirms who the user is.
+	•	Authorization (OAuth2) → Decides what the user can access.
+
+
+Q4. What are the main grant types in OAuth2?
+	•	Authorization Code Grant – Used in web & mobile apps.
+	•	Client Credentials Grant – Used for service-to-service communication.
+	•	Password Grant (Deprecated) – Used for legacy apps.
+	•	Refresh Token Grant – Used to renew access tokens.
+
+
+Q5. How do you implement OAuth2 in Spring Boot?
+✅ Use Spring Security + spring-boot-starter-oauth2-resource-server
+✅ Configure JWT-based authentication
+✅ Secure APIs using @PreAuthorize and scopes/roles
+
+
+Q6. What is the difference between OAuth2 and JWT?
+A. OAuth2 is a framework for authorization, while JWT (JSON Web Token) is a token format often used within OAuth2 for secure token exchange.
+
+
+Q7. How do microservices share authentication in OAuth2?
+A. Use a centralized Authorization Server (e.g., Keycloak, Okta, Auth0) and validate JWT tokens across all microservices.
