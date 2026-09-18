@@ -1,0 +1,17 @@
+started with introduction ?
+
+which project currently u r working and what technologies u r using ? 
+some discussion around the project?  // u must have indepth knowledge of your project. 
+which react version your are using ? 
+then he ask me to share screen open notepad and write a react component that have button and it must increament a count. 
+
+difference between useState and useRef ? 
+what is the use of keys in react? 
+
+question on useEffect and dependencies array and theire behavior ? 
+what is the use of redux ? 
+what is the use of useReducer function ? // not able to answer properly  
+
+what is the use of routes in react can you react the syntax of it? // although i write it on notepad
+
+what is conditional statement in react? can you write code of it? // I have written on notpad only
