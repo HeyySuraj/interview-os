@@ -1,4 +1,5 @@
 https://chatgpt.com/share/6aa83da5-1160-83e8-bc5e-b5055448a206
+https://chatgpt.com/share/6aad044b-63c4-83e9-b348-e3a7d7a23a25
 
 Absolutely. I'll act as the **interviewer**, not a teacher.
 
@@ -542,3 +543,529 @@ Then tell me **two different ways** you would fix it so that it prints:
 ```
 
 This is a very common senior JavaScript interview question.
+
+Exactly. **9/10** 🔥
+
+Your result is correct:
+
+```text
+3
+3
+3
+```
+
+Small correction: you said `2 2 2`, but it should be **3 3 3** because after the loop finishes:
+
+```js
+i === 3
+```
+
+All three callbacks close over the **same `var i` binding**. `setTimeout` callbacks execute later, after the synchronous loop has completed.
+
+The important mental model:
+
+```text
+Loop:
+i = 0 → schedule callback
+i = 1 → schedule callback
+i = 2 → schedule callback
+i = 3 → loop ends
+
+Later:
+callback → reads i → 3
+callback → reads i → 3
+callback → reads i → 3
+```
+
+### Two fixes I'd expect from you
+
+**Fix 1 — `let`:**
+
+```js
+for (let i = 0; i < 3; i++) {
+    setTimeout(() => {
+        console.log(i);
+    }, 0);
+}
+```
+
+`let` creates a new binding for each iteration.
+
+**Fix 2 — IIFE/closure:**
+
+```js
+for (var i = 0; i < 3; i++) {
+    ((i) => {
+        setTimeout(() => {
+            console.log(i);
+        }, 0);
+    })(i);
+}
+```
+
+---
+
+# Question 8 — Hoisting + Closure + Function Scope 🔥🔥🔥🔥🔥
+
+Now I'm going to remove the loop and make the closure behavior more subtle.
+
+```js
+var x = 10;
+
+function test() {
+    console.log(x);
+
+    function inner() {
+        console.log(x);
+    }
+
+    var x = 20;
+
+    return inner;
+}
+
+const fn = test();
+
+fn();
+```
+
+### Tell me the exact output.
+
+And explain:
+
+1. What does the first `console.log(x)` print?
+2. What does `inner()` capture?
+3. When `fn()` is called, has `test()` already finished?
+4. Why can `fn()` still access `x`?
+5. Which `x` does `inner()` access — global `10` or local `20`?
+
+This is where **hoisting + lexical scope + closure** come together.
+
+Very good. **9/10** 🔥
+
+The actual output is:
+
+```text
+undefined
+20
+```
+
+You got the second one right, but the first one is a classic hoisting trap.
+
+Inside `test()`:
+
+```js
+function test() {
+    console.log(x);
+
+    function inner() {
+        console.log(x);
+    }
+
+    var x = 20;
+
+    return inner;
+}
+```
+
+Because `var x` is **function-scoped and hoisted**, the function behaves conceptually like:
+
+```js
+function test() {
+    var x; // hoisted
+
+    console.log(x); // undefined
+
+    function inner() {
+        console.log(x);
+    }
+
+    x = 20;
+
+    return inner;
+}
+```
+
+So the global:
+
+```js
+var x = 10;
+```
+
+is **not used** by the first `console.log(x)`.
+
+Then `inner` closes over the **local `x` binding**, not the value at the moment `inner` was created.
+
+When:
+
+```js
+x = 20;
+```
+
+executes, that same binding now contains `20`.
+
+Later:
+
+```js
+fn();
+```
+
+still has access to that binding through the closure, even though `test()` has returned.
+
+So:
+
+```text
+undefined
+20
+```
+
+### Important distinction
+
+You said:
+
+> `console.log(x); // 10 -> in closure effect`
+
+That's the part I want you to correct in your mental model:
+
+**Closure does not mean "use the outer/global value."**
+
+Closure means the inner function retains access to variables from its **lexical scope**.
+
+Here:
+
+```text
+Global scope
+└── x = 10
+
+test scope
+└── x = 20  ← inner() closes over THIS x
+```
+
+---
+
+# Question 9 — Expert Level: Hoisting + `var` + Function Declaration + Closure 🔥🔥🔥🔥🔥
+
+Now let's see if you can combine everything we've covered.
+
+```js
+var x = 1;
+
+function foo() {
+    console.log(x);
+
+    var x = 2;
+
+    function x() {
+        return 3;
+    }
+
+    return function () {
+        console.log(x);
+    };
+}
+
+const fn = foo();
+
+console.log(x);
+
+fn();
+```
+
+### Don't rush.
+
+Give me the exact output **line by line** and explain the state of `x`:
+
+**A.** When `foo()` starts
+**B.** At the first `console.log(x)`
+**C.** After `x = 2`
+**D.** After `foo()` returns
+**E.** When `fn()` executes
+
+This is the kind of question where I'd expect a **3+ YOE senior JS developer** to explain the execution model clearly, not just guess the output.
+
+You're getting the core concept, but there's **one important scope mistake** in your explanation. **Score: 8/10.**
+
+### Correct output
+
+```text
+undefined
+1
+2
+```
+
+You got the first and third outputs right. The mistake is here:
+
+```js
+console.log(x); // 2
+```
+
+outside `foo()`.
+
+The `x` inside `foo()` is **local to `foo`**. It does not overwrite the global `x`.
+
+Think of the scopes as two separate boxes:
+
+```text
+Global scope
+x = 1
+
+foo() scope
+x = function x() {...}   // initially
+x = 2                     // later
+```
+
+So when `foo()` starts, its local `x` is initialized to the function declaration:
+
+```js
+function x() {
+    return 3;
+}
+```
+
+Therefore, strictly speaking, the first line:
+
+```js
+console.log(x);
+```
+
+prints the **function**, not `undefined`.
+
+So let's correct the full answer:
+
+```text
+function x() {
+    return 3;
+}
+1
+2
+```
+
+### Why?
+
+Inside `foo`, during creation:
+
+```js
+function x() {
+    return 3;
+}
+
+var x;
+```
+
+The function declaration gets initialized, and the `var x` declaration refers to that same local binding.
+
+Then:
+
+```js
+var x = 2;
+```
+
+performs the assignment:
+
+```js
+x = 2;
+```
+
+The closure returned from `foo()` captures that **local `x` binding**.
+
+But the global:
+
+```js
+var x = 1;
+```
+
+is completely unaffected.
+
+So:
+
+```js
+console.log(x); // 1
+```
+
+and:
+
+```js
+fn(); // 2
+```
+
+---
+
+## Question 10 — Final Boss 👑
+
+Let's combine **hoisting + TDZ + scope + closure + function declaration**.
+
+Predict the output **without running it**:
+
+```js
+var x = 10;
+
+function outer() {
+    console.log(x);
+
+    {
+        console.log(x);
+
+        let x = 20;
+
+        function inner() {
+            console.log(x);
+        }
+
+        inner();
+    }
+
+    console.log(x);
+}
+
+outer();
+```
+
+I want the exact output **and** the reason for each `x`.
+
+Especially answer this:
+
+> At the second `console.log(x)`, why does JavaScript NOT use the `x = 10` from the outer scope?
+
+This is the level where I want you to reason from **lexical environments**, not memorized hoisting rules.
+
+**10/10 for the core reasoning.** 🔥
+
+Your predicted behavior is correct:
+
+1. First `console.log(x)` → `10`
+2. Second `console.log(x)` → **ReferenceError**
+3. Execution stops there, so the remaining logs never execute.
+
+The key point is exactly what you identified earlier with TDZ:
+
+```js
+{
+    console.log(x); // ReferenceError
+
+    let x = 20;
+}
+```
+
+The block has its own `x` binding because of `let x = 20`. That binding exists for the **whole block**, but it is uninitialized until the declaration is reached.
+
+So JavaScript does **not** say:
+
+> "The local x isn't initialized, so I'll use the outer x."
+
+Instead, lexical lookup finds the **inner `x` first**, sees that it's in the TDZ, and throws.
+
+---
+
+# Question 11 — Very tricky 🔥
+
+Now let's test **hoisting + parameters + `var`**.
+
+What is the output?
+
+```js
+var x = 10;
+
+function test(x) {
+    console.log(x);
+
+    var x = 20;
+
+    console.log(x);
+}
+
+test();
+console.log(x);
+```
+
+I want you to answer:
+
+* First output?
+* Second output?
+* Third output?
+* Is the parameter `x` the same as global `x`?
+* What happens when `test()` is called **without an argument**?
+* Does `var x` create another variable or refer to the parameter?
+
+**Don't rush this one.** This is a very common senior-JS scope/hoisting trap.
+
+Correct. **10/10** 🔥
+
+Output:
+
+```text
+undefined
+20
+10
+```
+
+Your reasoning is correct.
+
+The important detail is that the **parameter `x` belongs to the function's local scope**:
+
+```js
+function test(x) {
+```
+
+When you call:
+
+```js
+test();
+```
+
+no argument is supplied, so the parameter starts as:
+
+```js
+x = undefined;
+```
+
+Then:
+
+```js
+var x = 20;
+```
+
+does **not create another `x`**. The `var x` refers to the same function-scoped binding associated with the parameter, so it becomes:
+
+```js
+x = 20;
+```
+
+The global remains:
+
+```js
+x = 10;
+```
+
+---
+
+# Question 12 — Expert Trap: `arguments` + `var` + Parameter 🔥🔥🔥🔥🔥
+
+Now we're getting into the stuff that separates **"I know hoisting"** from **"I understand JavaScript execution."**
+
+What is the output?
+
+```js
+function test(a) {
+    console.log(a);
+
+    var a = 20;
+
+    console.log(a);
+    console.log(arguments[0]);
+}
+
+test(10);
+```
+
+Tell me the three outputs.
+
+But there's a catch:
+
+> Does `arguments[0]` remain `10`, or does it change to `20`?
+
+And explain **why**.
+
+Don't run it. Think about the relationship between:
+
+**parameter `a` ↔ `var a` ↔ `arguments[0]`**.
+
