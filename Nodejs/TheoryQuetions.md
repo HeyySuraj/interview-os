@@ -1,5 +1,7 @@
 
 https://claude.ai/share/bb819cea-aed9-4e3f-b731-ff1c154e7880
+
+JWT Token [https://youtube.com/shorts/G9mVWqxbEz4?si=ggKcBHh5vX22gLem]
 # What operations actually block the event loop, and how do you detect/fix that in production?
 ## What Blocks the Event Loop
 
