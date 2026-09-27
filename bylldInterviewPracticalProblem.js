@@ -128,7 +128,7 @@
 // this was first secontion then second section has theory quetoin in 3rd  practical coding problems 
 
 
-// 1. Function declaration and function expression
+// 1. Function declaration and function expression ans = https://www.freecodecamp.org/news/function-declaration-vs-function-expression/
 // 2. What are the different types of functions declaration
 // 1. 
 // what are components of javascript engine // smthing like this questions ? like event loop 
