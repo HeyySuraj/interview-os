@@ -26,3 +26,5 @@ console.log(firstUniqueChar(input))
 // in js is everything is object
 // how network thread work. if u hit google.com how it work in backedn
 // what is prototype inheritance? 
+// he asked about cross site scripting 
+// and then security practive to follow to secure the application
