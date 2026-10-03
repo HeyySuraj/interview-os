@@ -1,3 +1,7 @@
+
+## Note: I wish to work in senior position contributing to the betterment of my workplace and society.
+
+
 ## 20. What is your biggest strength?
 
 
