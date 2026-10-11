@@ -12,3 +12,5 @@ https://youtu.be/jxso9wTBkNg
 4. Fail Over Procedure
 5. Spanner
 6. Atomic Clock
+
+
