@@ -1,6 +1,8 @@
 https://chatgpt.com/share/6aa83da5-1160-83e8-bc5e-b5055448a206
 https://chatgpt.com/share/6aad044b-63c4-83e9-b348-e3a7d7a23a25
 
+https://chatgpt.com/share/6ab2c92c-0590-83e8-9a46-eebd9de6cf08
+
 Absolutely. I'll act as the **interviewer**, not a teacher.
 
 Since you said you're a JS master, I'll progressively increase the difficulty: **basic → tricky → edge cases → output prediction → real interview traps**. I won't give hints unless you ask.
@@ -1068,4 +1070,155 @@ And explain **why**.
 Don't run it. Think about the relationship between:
 
 **parameter `a` ↔ `var a` ↔ `arguments[0]`**.
+
+This one exposes an important misconception. **Score: 6/10.**
+
+Your **second and third outputs are correct**, but the first is not.
+
+### Correct output
+
+```text
+10
+20
+20
+```
+
+### Why?
+
+You said:
+
+> `undefined -> var hoisted and initialise with undefined`
+
+That's the trap.
+
+There is already a parameter:
+
+```js
+function test(a)
+```
+
+When you call:
+
+```js
+test(10);
+```
+
+the parameter `a` is initialized with `10`.
+
+Then:
+
+```js
+var a;
+```
+
+does **not create another local variable**. It's effectively the same binding.
+
+Conceptually:
+
+```js
+function test(a) {
+    // a already exists as parameter and contains 10
+
+    console.log(a); // 10
+
+    a = 20;
+
+    console.log(a); // 20
+    console.log(arguments[0]); // 20
+}
+```
+
+And here's the really important part:
+
+In a **non-strict function**, the parameter binding and the corresponding `arguments` element are mapped:
+
+```text
+a  ←→  arguments[0]
+```
+
+So when:
+
+```js
+a = 20;
+```
+
+you also observe:
+
+```js
+arguments[0] === 20
+```
+
+Therefore:
+
+```text
+10
+20
+20
+```
+
+### But here's the senior-level twist
+
+If we add `"use strict"`:
+
+```js
+function test(a) {
+    "use strict";
+
+    console.log(a);
+
+    a = 20;
+
+    console.log(a);
+    console.log(arguments[0]);
+}
+
+test(10);
+```
+
+then the output becomes:
+
+```text
+10
+20
+10
+```
+
+because strict mode gives you **unmapped arguments**.
+
+---
+
+# Question 13 — No More Easy Ones 😈
+
+Now let's combine **function declaration hoisting + parameters + `var` + reassignment**.
+
+What is the output?
+
+```js
+function test(a) {
+    console.log(a);
+
+    var a = 20;
+
+    function a() {
+        return 30;
+    }
+
+    console.log(a);
+}
+
+test();
+```
+
+Don't answer from pattern matching.
+
+Walk through the **creation phase** of `test()`:
+
+1. Parameter `a`
+2. `var a`
+3. `function a()`
+4. What is the initial value of `a`?
+5. What happens when `var a = 20` executes?
+
+Then give me the exact output.
+
 
