@@ -1,3 +1,5 @@
+
+
 # OAuth 2.0 & Spring Boot Security — Senior Developer Interview Guide
 
 > A practical interview guide covering OAuth 2.0, OpenID Connect, JWT, Authorization Server, Resource Server, clients, grants, token validation, microservices architecture, Spring Boot implementation, security pitfalls, and senior-level interview questions.
