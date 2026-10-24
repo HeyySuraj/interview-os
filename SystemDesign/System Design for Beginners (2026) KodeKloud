@@ -287,6 +287,53 @@ primary database machine. Can replicas save us here?
 No, they won't save us because every replica has to hold exactly the same data as primary database 2. Therefore, at some point, **we have to divide our database into multiple parts. This technique is called sharding.**
 
 
+* But splitting the data raises an obvious question. If Allan opens his profile, on which shard is Allen's data.
+
+We can't go searching all four shards one by one. That would defeat the whole purpose of splitting. We need a rule that tells us on which shard we can find the data. We first pick one field of the data on basis of which we will split the data across four shards. **And this field is called the shard key.** 
+
+For our photo app, the natural shard key is the user ID.
+Because everyone will have unique user ID, it makes sense to distribute the data based on user ID.
+
+* But how do we divide the data in four parts? 
+
+The simplest rule we can use is division. **Divide the user ID by the number of
+shards and the remainder is your shard number.** 
+
+Let's do this with real numbers. Alen's user ID is 10. 10 / 4 leaves
+remainder 2. So Alan lives on shard 2. Another user has ID 13. 13 / 4 leaves
+remainder 1. So that user lives on shard one. This rule is fast and every server
+can compute it instantly. 
+
+* But two things can go wrong with sharding and you should know both. *The first problem is
+called a hot shard. *
+
+Let's say by bad luck Messi and Ronaldo and all the other celebrity accounts land on shard 2.
+Millions of users open these celebrity profiles every minute. So shard 2 will have a lot of load as compared to other
+shards. 
+
+The fix is to pick some other shard key that spreads users evenly across all the shards. For example,
+instead of putting all the celebrities together on one shard, a good shard key will scatter Messi on shard one, Ronaldo
+on shard three, and so on so that no single shard becomes overburdened. 
+
+* The second problem is worse. Remember our
+simple division rule. Divide by the number of shards. We were dividing the user ID with number four because we had
+four shards. Now let's say the app grows more and we add a fifth shard. Because we have five shards now, our rule
+changes from divide by four to divide by 5. Watch what happens to Alen. Earlier 10 / 4 gave remainder 2. So Alen's data
+lives on shard 2. But now 10 / 5 gives remainder zero. So the rule says Allen
+should be on shard zero. But Allen's data is still physically sitting on shard 2. And it's not just Allen. The
+remainder changes for almost every user ID because we are now dividing the user ID with five instead of four. Which
+means almost all of our data has to physically move to a different shard. Imagine moving billions of photos
+between different databases just because we added one more machine. That's a nightmare. 
+
+**The industry fix for this nightmare is called consistent hashing.** What consistent hashing makes sure is that we move least amount of data between different shards when we add more shards. The trick is that in consistent hashing, the rule doesn't depend on the total number of shards. Each shard owns a small range of user IDs. And when we add a fifth shard, the new shard takes over only a small range from only one neighbor. So only those few users move. and all other shards
+remains unaffected. 
+
+**So remember, sharding is the tool you use when your database can't fit on one machine. But
+use sharding as late as possible in your systems because once you split the data across shards, joining it back together
+is the hardest thing to undo. Luckily, databases like MongoDB already have sharding built in so that we don't have
+to implement it ourselves.**
+
+
 
 
 
