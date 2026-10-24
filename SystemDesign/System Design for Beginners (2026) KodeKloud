@@ -211,7 +211,80 @@ at all.
 
 ## Database Indexes
 
+* Do not guess which column to index. I repeat, do not guess which
+column to index. First you should identify your slow queries. Which of the
+queries are actually *getting slow? And then to make those queries faster, you should index the relevant columns.* There
+is no hard rule on how many indexes you have to create. But in general, you will
+see most of the tables have three to five indexes. So start with zero indexes, see which queries are slow, and
+then add the indexes.
 
+# Caching 
+
+
+# Replacation
+
+* Since we are copying the data from primary database
+to replicas, we know that replicas will always be slightly behind to the primary database and we call this replication
+lag. Usually it takes few milliseconds to get the latest data from primary database to the replica. What we say is
+primary database and replicas are not consistent at the moment but they will get consistent eventually and this
+phenomenon in **technical world is called eventual consistency.** 
+
+* The replica doesn't have the newest write yet but it
+will eventually. Now let me show you the bug this replication lag creates in real life.
+Alan uploads a new photo and this right goes to the primary database. Half a second later refreshes his profile page
+to see his own photo. Refreshing the profile is a read query and we know the read queries are distributed to all
+three databases. Let's say this read goes to replica 2 and replica 2 has not received the new photo from the primary
+database yet. So Alan just posted a photo and his own profile is showing there is no photo for a very short
+while. But notice the data was never lost. The photo was safely sitting in
+the primary database the whole time. 
+
+* **The replica was just slightly behind the primary database. So how do we fix this
+bug?** 
+
+The fix is simple. When a user is reading their own recent data, we send that read query to the primary database
+because we know we surely find the recent data in primary database. So Alen's own profile reads from the
+primary database and Alen will always see his own photo immediately. But when other users open Allen's profile, their
+read queries can go to the replicas because if some other user sees Alen's new photo half a second late, it hurts
+no one. And this gives us the opposite term, strong consistency. Strong
+consistency means every read is guaranteed to return the latest data. And the simplest way to get strong consistency is to read from the primary database because the primary database always has the latest data. But remember, every read we send to the
+primary database adds load back on the primary database, the exact load we were trying to reduce. So we don't make
+everything strongly consistent. Most of a photo sharing app is perfectly fine with eventual consistency. Deciding
+which part of the app needs which consistency is a real skill in system design. Now let's come back to the
+reason we added replicas in the first place. To avoid the single point of failure. 
+
+## What happens if the primary database actually dies? 
+
+Our app does not go down. We will promote one of the replicas to become the new primary
+database. This promotion of replica to primary database is called failover. To
+summarize, replication gives us two benefits. Replicas takes the reload and reduce burden on primary database and
+replicas save the app when the primary database dies.
+
+## Backup
+
+* There's one more thing that I want to be aware of and this is
+the single most dangerous misunderstanding students have with replicas. Let's say someone on your team runs a wrong delete query on the primary
+database and wipes 1 million photo records. Basically, they deleted the complete primary database. 
+
+* What will the replicas do? The replicas blindly copy everything from the primary database, including your mistakes. Within
+milliseconds, that delete query reaches both the replicas. And now all three copies are perfectly empty. Replications
+do not save your data if you make a mistake and delete the data. 
+
+* That's why we also need real backups. A backup is a
+snapshot of the database and we keep this snapshot away from the system. So if someone wipes the data on Tuesday,
+you can restore Monday night's backup. 
+problem was solved.
+
+# Sharding 
+In the last lesson, we added two replicas of our database and our read
+* If our primary database holds
+1 tab, then replica 1 also holds the same 1 TB and replica 2 also holds the
+same 1 TB. 
+Now, let me ask you a question. Let's say we reach 50 million
+users and they have uploaded billions of photos, comments, and likes. What happens when all this data becomes too
+big to fit on one database machine? Eventually, we will accumulate so much data that it won't be fitting on one
+primary database machine. Can replicas save us here? 
+
+No, they won't save us because every replica has to hold exactly the same data as primary database 2. Therefore, at some point, **we have to divide our database into multiple parts. This technique is called sharding.**
 
 
 
