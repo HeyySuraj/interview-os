@@ -107,4 +107,42 @@ How a request actually travels
 ## How a request travels
 25:48 How a request travels: DNS lookup, HTTPS request, Server response. 28:06 Latency vs. Bandwidth. 29:44 Load Balancer: Health checks and distribution. 35:40 Stateless vs. Stateful: Store login sessions in a shared store (like Redis) to stay stateless.
 
-41:58 Interview Byte 4: Why stateless matters. 43:04 Free Lab 1: Load balancer. 43:49 Data Modeling: Define what to store. 46:02 Store image links, not files. 46:29 Connections: Likes, comments, follows. 48:19 Five items: Users, Photos, Likes, Comments, Follows. 48:52 Why define this? Access patterns! 50:43 SQL vs. NoSQL: Structure vs. Unstructured. 52:19 Transactions (ACID). 56:02 Interview Byte 5: Justifying SQL vs. NoSQL. 57:15 Database Indexes: Speed up reads by pointing to exact rows. 1:01:06 Free Lab 2: Database Indexes. 1:02:22 Caching: Use Redis for hot data. 1:11:21 Interview Byte 6: Failure-driven design. 1:12:53 Free Lab 3: Caching. 1:13:01 Replication: Primary/Replica for read distribution and failover. 1:19:34 Sharding: Split data across machines. 1:24:03 Free Lab 4: Replication. 1:24:27 Summary: The design we made so far: Load Balancer, Stateless Servers, Redis Cache, Postgres (Primary + 2 Replicas), MongoDB, Sharding.
+41:58 Interview Byte 4: Why stateless matters. 43:04 Free Lab
+
+# Load balancer
+ 1: Load balancer. 
+
+ * A load balancer is the most common kind of reverse proxy you'll ever meet. So if you hear reverse proxy, picture the load balancer in your mind. 
+
+Now what if one of the servers dies?
+* In this case, the load balancer should not send the requests to the dead server.
+How does the load balancer know if a server is actually working or dead or
+overloaded? This is the part that makes a load balancer more than a traffic splitter.
+The load balancer actually does health checks for each server. Every few seconds, the load balancer quietly pings
+each app server. You still alive? If server 3 stops answering, the load
+balancer notices within seconds and just stops sending traffic to server 3. The
+other nine pick up the work of the third server. Your users never see an error
+because the load balancer never sent the request to the dead server. 
+
+* And that's the whole request path so
+far. The user asks DNS for the address. DNS returns the load balancer's IP
+address. The load balancer then picks a healthy app server. The app server does
+the work, reads from the database, and the answer travels back the same way.
+Every request to your app from now on walks that path. (32:59)
+
+* And you need to also remember that all servers are not the same size. Some servers can be larger and can handle
+more requests. So the load balancer can also do weighted distribution.
+
+## What if the load balancer itself goes down?
+That would be a real problem because all traffic will hit a dead end and all 10 app servers
+behind the load balancer become unreachable. That's why in real production systems,
+companies don't run just one load balancer. They run multiple load balancers. So if one fails, another
+takes over. How multiple load balancers work together is a separate problem
+which we will not address right now.
+
+
+# Stateless Vs Statefull
+* Stateful means the application keeps memory of previous requests.
+ 
+ 
+ 43:49 Data Modeling: Define what to store. 46:02 Store image links, not files. 46:29 Connections: Likes, comments, follows. 48:19 Five items: Users, Photos, Likes, Comments, Follows. 48:52 Why define this? Access patterns! 50:43 SQL vs. NoSQL: Structure vs. Unstructured. 52:19 Transactions (ACID). 56:02 Interview Byte 5: Justifying SQL vs. NoSQL. 57:15 Database Indexes: Speed up reads by pointing to exact rows. 1:01:06 Free Lab 2: Database Indexes. 1:02:22 Caching: Use Redis for hot data. 1:11:21 Interview Byte 6: Failure-driven design. 1:12:53 Free Lab 3: Caching. 1:13:01 Replication: Primary/Replica for read distribution and failover. 1:19:34 Sharding: Split data across machines. 1:24:03 Free Lab 4: Replication. 1:24:27 Summary: The design we made so far: Load Balancer, Stateless Servers, Redis Cache, Postgres (Primary + 2 Replicas), MongoDB, Sharding.
