@@ -1,0 +1,28 @@
+## Video Transcript: System Design for Beginners (2026)
+https://youtu.be/SE2KF-vxvS0
+
+**Introduction**
+
+0:00 This video is designed for absolute beginners who want to understand what system design is and how it actually works. 0:08 And instead of covering topics in isolation, we'll attempt to design one real application together and improve the design step by step. 0:17 Every concept, load balancers, caching, indexing, replication, sharding shows up exactly when our app needs it, so you always know why a component exists. 0:28 You'll also get free hands-on labs along the way where you can play with some of the components of the system. 0:34 So if that sounds useful, let's get started.
+
+**What is System Design?**
+
+0:37 When you look at the technology landscape, there are so many tools available to you like databases, caching systems, CDNs, load balancers, servers, and many more. 0:47 But ultimately, what you want to do is solve a specific problem. 0:49 For example, you might want to make an application that lets users share photos with each other. 0:55 To build this app, you have to use these components in the right way. 1:00 System design is the skill of choosing the right components and putting them in the right place to solve a software problem. 1:04 And when you transition from junior to senior roles in engineering, your responsibilities around that system change a lot.
+
+**Engineering Roles**
+
+1:10 As a junior engineer, your job is to develop a specific feature. 1:12 You code something where you already know what the input will be and what the output should be. 1:19 As a mid-senior engineer, you're handed a problem and you have to figure out the approach yourself and how your solution fits inside the existing system. 1:27 And as a senior engineer, you have to design that system itself and make a lot of choices on how the whole technology should work. 1:36 The aim of this course is to help you get started with how mid-seen and senior engineers think about systems. 1:41 And the best way to learn how they think is to watch a system get designed and watch it fail as well.
+
+**Starting Small: The $10 Server**
+
+1:47 So let's take an example and try to understand what problems we face when we do system design and why system design is actually required. 1:55 Let's say you want to build an app, a site where people upload and share photos. 2:00 You wrote the code and then you rented one server for $10 a month. 2:04 If you are wondering what a server is, then it is just a computer sitting in someone's data center whose whole job is answering your visitors requests. 2:12 So you take this server and put all the components in this server. 2:14 The web app, the database, the uploaded photos, all of it lives on this server. 2:18 And honestly, this is a great setup. 2:21 It's easy to build, easy to take it live. 2:23 And when something breaks, you know that I need to take a look at this server only. 2:26 Most of the apps should start exactly like this.
+
+**Scaling Failures**
+
+2:32 Now, let's say your app gets featured somewhere and 10,000 people show up in one business day. 2:38 That one server may not be able to handle this much traffic and even if it does not crash, the app can become painfully slow. 2:45 But let's see some of the specific ways it can fail. 2:47 And every one of these failures has a name and a fix. 2:52 That list of fixes is basically the whole field of system design.
+
+*   **Failure #1: CPU and RAM exhaustion.** 2:54 The server runs out of CPU and RAM. 2:59 Every visitor opening their feed means your CPU is resizing images and running database queries at the same time. 3:05 Pages that loaded in 200 milliseconds now take 10 seconds. 3:08 The obvious fix is that you add a second server. 3:10 So half the people go to one machine and half go to the other. 3:14 But that creates a brand new question. 3:16 When someone opens your site, which of the two servers should they talk to, first or second? 3:24 You need a traffic officer standing in front deciding where each request goes. 3:28 That traffic officer is called a load balancer. 3:30 As the name says, it balances load on your servers, and it's the first box we'll add to our system.
+
+*   **Failure #2: Database Overloaded.** 3:37 The database gets overloaded. 3:40 Most of those 10,000 visitors are asking for the same things, the same trending photos, the same popular profiles again and again. 3:47 And your database runs the same query from scratch every single time. 3:53 The easy fix is to keep the popular answers sitting in separate memory so that we don't have to query database again and again. 3:59 This fast memory layer is called a cache. 4:02 And this is the second box we'll add to our system.
+
+*   **Failure #3: The Machine Dies.** 4:06 The machine just dies. 4:09 Probably a disc fails or a power supply gives out. 4:11 Someone unplugs the wrong cable. 4:14 And because everything lived on that one box, your app is down and every photo anyone uploaded could be gone. 4:21 There's a name for this problem. 4:23 It is called a single point of failure. 4:25 The fix is to keep data on more than one machine. 4:28 You can create a replica or copy of the database which is running on a different machine and your actual photo files can move to external object storage like S3 which is built to store large files safely and keep multiple copies automatically.
