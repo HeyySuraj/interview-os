@@ -143,6 +143,189 @@ which we will not address right now.
 
 # Stateless Vs Statefull
 * Stateful means the application keeps memory of previous requests.
+* Just ask one question. If this server vanished right now, would any user lose something? If the answer is yes, that data is making the server stateful. Honestly, if data is making your server stateful, then that data has no business living on the server. Move it to a shared store built for holding things and let the server go back to being disposable.
  
  
+# Data Modeling: Identifying Access Patterns 
+
+* Now, when people start designing, the first question most of them ask is **which database should I use, Postgress or MongoDB?
+That shouldn't be the first question you ask yourself.** The first question that you need to ask is what are people going
+to ask this app to do. 
+
+* Basically, we should first understand the access patterns of our users. An access pattern
+is simply a question your users will keep asking your app thousands of times a day. So, let's write down the access
+patterns of our photo app. First question our users will ask is, "Show me
+a user's profile." because our users will go through others profile. Second,
+show me all photos uploaded by a user. Third, show me my home feed. Fourth,
+upload a photo. Fifth, like a photo. Sixth, comment on a photo. Seventh,
+follow another user. Look at this list carefully. This list is basically your
+whole app written down as a set of questions. Once we have the questions, we can design the data that answers
+them.  (for more watch video from 45:37)
+
+# SQL vs NoSQL
+
+* Is our data structured or unstructured? If the data is structured, we use SQL database and
+if it is unstructured, we use NoSQL database. Let's dive deeper into this.
+
+* SQL databases provide good structure. Your **data lives in table format with a
+fixed shape just like a spreadsheet where you have rows and columns.** 
+
+* If we look at photos that we upload in our app, then **we know each photo has exactly the same fields every time**.
+So all the photos will have an ID, who posted the photo, the caption, the
+upload time and the image link. So we can have one table named photo details.
+Second functionality that SQL provides is relationships.
+
+* A SQL database is built to connect or join tables together. If my query is
+find everyone Alan follows, then find their photos, then I can join two
+tables. The follows table gives me everyone Alan follows and the photos
+table gives me the photos posted by those people. By connecting tables, I
+can easily answer a lot of similar questions. 
+
+* An SQL also gives you transactions.
+What do we mean by transaction? Let's say Alan deletes one of his photos. Then we need to delete the photo
+record. But then we also need to delete all the like records and comment records
+associated with this photo. So we group the deletion of photo, its likes and
+comments as one unit and call it one transaction. So either all of the deletion will
+happen successfully or none of them will happen. This makes sure that data is never left
+half finished. You will never want to store likes and comments of a photo
+which has been deleted. That's why we group them in one transaction. This transaction property falls under acid
+guarantee that SQL provides.
+
+* Also, let's make one thing absolutely clear. **A database is not some special piece of hardware.
+Postgress, MongoDB, or any other database is just a program running on a
+regular server with a CPU, RAM, and a disk. You can run Postgress or MongoDB
+on your laptop right now.** 
+
+## There's one question that comes up in almost every design interview. The interviewer asks you to choose between SQL or NoSQL for your design, and you need to explain why you chose one over another. Why is the most important piece? What earns points is deriving the choice from your access patterns. 
+* You should say,
+"My data is relational in nature. users, photos, follows are connected with each
+other. To display the home feed, I need to connect these data points together,
+which means I will do joins. Therefore, it makes sense to use SQL. If I later
+add a high volume piece with no relationships like analytics events, that piece can go to no SQL.
+In these couple of sentences, you've covered structure of data, joins, guarantees, and the fact that real
+systems use both. You shouldn't say things like, "I will choose no SQL because it scales." 
+
+* The interviewer will ask, "What exactly stops SQL from handling your workload?" And remember the word acid before you walk in the
+interview. ACID makes sure either we write full transaction or write nothing
+at all.
+
+## Database Indexes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  43:49 Data Modeling: Define what to store. 46:02 Store image links, not files. 46:29 Connections: Likes, comments, follows. 48:19 Five items: Users, Photos, Likes, Comments, Follows. 48:52 Why define this? Access patterns! 50:43 SQL vs. NoSQL: Structure vs. Unstructured. 52:19 Transactions (ACID). 56:02 Interview Byte 5: Justifying SQL vs. NoSQL. 57:15 Database Indexes: Speed up reads by pointing to exact rows. 1:01:06 Free Lab 2: Database Indexes. 1:02:22 Caching: Use Redis for hot data. 1:11:21 Interview Byte 6: Failure-driven design. 1:12:53 Free Lab 3: Caching. 1:13:01 Replication: Primary/Replica for read distribution and failover. 1:19:34 Sharding: Split data across machines. 1:24:03 Free Lab 4: Replication. 1:24:27 Summary: The design we made so far: Load Balancer, Stateless Servers, Redis Cache, Postgres (Primary + 2 Replicas), MongoDB, Sharding.
