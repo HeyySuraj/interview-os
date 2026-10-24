@@ -19,10 +19,92 @@ https://youtu.be/SE2KF-vxvS0
 
 **Scaling Failures**
 
-2:32 Now, let's say your app gets featured somewhere and 10,000 people show up in one business day. 2:38 That one server may not be able to handle this much traffic and even if it does not crash, the app can become painfully slow. 2:45 But let's see some of the specific ways it can fail. 2:47 And every one of these failures has a name and a fix. 2:52 That list of fixes is basically the whole field of system design.
+2:32 Now, let's say your app gets featured somewhere and 10,000 people show up in one business day. 2:38 That one server may not be able to handle this much traffic and even if it does not crash, the app can become painfully slow. 2:45 But let's see some of the specific ways it can fail. 2:47 And **every one of these failures has a name and a fix. 2:52 That list of fixes is basically the whole field of system design.**
 
 *   **Failure #1: CPU and RAM exhaustion.** 2:54 The server runs out of CPU and RAM. 2:59 Every visitor opening their feed means your CPU is resizing images and running database queries at the same time. 3:05 Pages that loaded in 200 milliseconds now take 10 seconds. 3:08 The obvious fix is that you add a second server. 3:10 So half the people go to one machine and half go to the other. 3:14 But that creates a brand new question. 3:16 When someone opens your site, which of the two servers should they talk to, first or second? 3:24 You need a traffic officer standing in front deciding where each request goes. 3:28 That traffic officer is called a load balancer. 3:30 As the name says, it balances load on your servers, and it's the first box we'll add to our system.
 
 *   **Failure #2: Database Overloaded.** 3:37 The database gets overloaded. 3:40 Most of those 10,000 visitors are asking for the same things, the same trending photos, the same popular profiles again and again. 3:47 And your database runs the same query from scratch every single time. 3:53 The easy fix is to keep the popular answers sitting in separate memory so that we don't have to query database again and again. 3:59 This fast memory layer is called a cache. 4:02 And this is the second box we'll add to our system.
 
-*   **Failure #3: The Machine Dies.** 4:06 The machine just dies. 4:09 Probably a disc fails or a power supply gives out. 4:11 Someone unplugs the wrong cable. 4:14 And because everything lived on that one box, your app is down and every photo anyone uploaded could be gone. 4:21 There's a name for this problem. 4:23 It is called a single point of failure. 4:25 The fix is to keep data on more than one machine. 4:28 You can create a replica or copy of the database which is running on a different machine and your actual photo files can move to external object storage like S3 which is built to store large files safely and keep multiple copies automatically.
+*   **Failure #3: The Machine Dies.** 4:06 The machine just dies. 4:09 Probably a disc fails or a power supply gives out. 4:11 Someone unplugs the wrong cable. 4:14 And because everything lived on that one box, your app is down and every photo anyone uploaded could be gone. 4:21 There's a name for this problem. 4:23 It is **called a single point of failure**. 4:25 **The fix is to keep data on more than one machine**. 4:28 You can create a replica or copy of the database which is running on a different machine and your actual photo files can **move to external object storage like S3** which is built to store large files safely and keep multiple copies automatically.
+
+---
+
+4:41 **Did you notice what we did in those three steps? We never rewrote the app. 4:46 We never made the code smarter.** All we did was split the work across machines 4:50 and decide where each piece should live. 4:53 That's really what system design is. 4:55 choosing where the pieces go and 4:57 understanding what each choice costs you 5:00 because **every fix we added brings a new problem of its own**. For example, we 5:04 added the load balancer and it can die 5:06 too. We added cache. What if the cache 5:09 stores old instead of fresh data? We 5:12 added database replica. What if the 5:14 replica is not up to date with original 5:16 database? And that chain of fix 5:18 something, get a new problem, fix that 5:20 is exactly the chain this course talks 5:21 about. And you don't learn system design 5:24 by memorizing diagrams. You learn it by 5:26 watching different components fail. By 5:28 the end, when someone asks how you'd 5:30 scale an app, you won't be reciting a 5:37 HLD vs. LLD
+
+## HLD vs. LLD
+5:39 System design has two levels: High-Level Design (HLD) and Low-Level Design (LLD). 5:44 High-Level Design is the zoomed-out view, the architecture, the big boxes. 5:56 It's about app servers, databases, caches, queues, and how they talk to each other. 6:01 Low-Level Design is the zoomed-in view, the code, the class structures, the data objects. 6:44 These are two different skills, but both are essential.
+
+7:45 Interview Byte 1: The key to system design interviews is not to start drawing boxes immediately. 8:15 First, clarify requirements. 8:56 Functional vs. Non-Functional requirements are the backbone of any design. 9:21 Functional requirements define what the system does (sign up, upload, feed). 10:10 Non-functional requirements (or quality attributes) define how the system performs (latency, availability, durability, cost).
+
+10:50 Instagram and our app have similar features. 11:04 **What separates them is entirely non-functional requirements.** 11:07 One serves 10 people, the other serves a billion. 11:16 Every component we add—load balancer, cache, replicas—exists to meet these requirements. 11:30 The user never asks for a cache; they ask for a fast app. 11:40 Non-functional requirements always conflict. 11:45 Faster systems cost more. 11:51 High availability means idle machines cost you money. 12:04 You must decide what is necessary.
+
+12:20 5 Questions Before You Design Anything: (YOU MUST ASK THIS QUETIONS ANY HOW)
+12:31 1. Scale? (How many users?) and how they are growing
+13:02 2. Access patterns? (Read vs. write heavy?)
+13:43 3. Data integrity? (What can be lost?) Third question, what data can you absolutely never lose? And what can you
+afford to lose? Can you afford to lose a user's uploaded photo? Never. If you lose someone's
+photos, you've lost a customer for life. But the count of likes on a photo being off by three for a few seconds, probably nobody's going to notice if you have 41 likes instead of 45. Knowing the difference tells you where to spend money on durability and where to relax
+
+14:16 4. Latency? (how much latency can we afford?) (How fast should the feed load?)
+14:52 5. what does it Cost? (What is the budget?)
+15:14 We now understand our photo app needs to support millions, is read-heavy, and must be instant.
+
+## Interview Byte
+ 2: Always start with requirements. (Always remember that the first five 
+ minutes of a design interview aren't about design at all. When the question lands that you need to design a photo
+ sharing app, the interviewer is watching whether you start drawing or you ask
+ some follow-up questions. Strong candidates ask the questions we already discussed.)
+
+ 17:30 Monolith vs. Microservices. 17:46 Monolith: one codebase, one deployment. 18:23 Microservices: split into small, independent programs.
+20:12 Monoliths are easier to start with; microservices help when teams grow and need to deploy independently. 21:01 For our photo app, we start as a monolith. 
+
+## Vertical vs. Horizontal Scaling.
+21:24 Vertical vs. Horizontal Scaling. 21:44 Vertical: bigger server (easier). 22:12 Limitations: hard ceiling, cost increases, single point of failure. 23:00 Horizontal: many small servers. 23:18 Advantages: no upper limit, no single point of failure. 24:28 Interview Byte 3: Explain the trade-offs of scaling.
+
+* The first way is vertical scaling. You make your server bigger. You add more
+CPU. You add more RAM and a faster disc. It's the easy choice. You don't change a
+single line of code. You just pay for a more powerful machine. And for a while,
+vertical scaling is genuinely the right move. If a bigger box buys you another
+year, you should take it. But vertical scaling also has limitations.
+Once you have purchased the biggest machine available to you in the market, you can't increase the size anymore.
+
+Also, the price doesn't grow in a straight line either. Going from a small server to a medium
+one is cheap. Going from the second biggest to the biggest can double your bill, but it may
+add only 20% more power. You pay more and more for less and less
+as you increase the size of the machine. And one big server is still one server.
+If it goes down, your whole app goes down with it. Making the box bigger doesn't fix that.
+
+* So, the second way is horizontal scaling. Instead of one big server, you
+run many small servers, each running a copy of your app. 10 cheap machines
+instead of one giant one. Need more capacity? Add an 11th one.
+This is how every large system on the planet actually scales because
+horizontal scaling has two things vertical scaling never will. There's no
+upper limit. You can always add another machine. And there's no single point of failure.
+If one of the 10 machines dies, the other nine keep serving.
+But the moment you have 10 servers running your app, **you've got a brand new question.
+When a user named Allen opens the app, which of these 10 servers handles** the
+request? A load balancer has to stand in front and spread the traffic across 10
+machines. And another problem, those 10 servers
+can't each keep their own copy of the data. Or a photo you upload to server 3
+is invisible when your next request lands on server 7. T**he data has to live somewhere all 10
+share.** So the rule of thumb, scale up vertically first because it's simple.
+then scale horizontally when you hit the limit or when you can't afford a single
+point of failure. I've seen teams jump to a fleet of servers for an app that 50 people touch
+a day and all they bought was complexity and nothing else. There's a warm-up
+question interview. Your app is slow. Why not just buy a bigger server? In
+this case, the interviewer just wants to know, do you know what the trade-offs of
+each approach are? The answer that works starts with vertical scaling. Explain
+that we will go with a bigger server first because it's simple and buys you
+time with zero code changes, but then explain vertical scaling has a hard
+ceiling and one server can be a single point of failure.
+So you go for horizontal scaling. Interviewers also care if your answers
+come with specifics. You should mention that a 50 user internal tool should use
+vertical scaling and a consumer app heading for a million users should go
+for horizontal scaling. And in most cases you end up using both scaling
+strategies. Let's pause the scaling story for one video and answer a question we've been skipping for some
+How a request actually travels
+
+## How a request travels
+25:48 How a request travels: DNS lookup, HTTPS request, Server response. 28:06 Latency vs. Bandwidth. 29:44 Load Balancer: Health checks and distribution. 35:40 Stateless vs. Stateful: Store login sessions in a shared store (like Redis) to stay stateless.
+
+41:58 Interview Byte 4: Why stateless matters. 43:04 Free Lab 1: Load balancer. 43:49 Data Modeling: Define what to store. 46:02 Store image links, not files. 46:29 Connections: Likes, comments, follows. 48:19 Five items: Users, Photos, Likes, Comments, Follows. 48:52 Why define this? Access patterns! 50:43 SQL vs. NoSQL: Structure vs. Unstructured. 52:19 Transactions (ACID). 56:02 Interview Byte 5: Justifying SQL vs. NoSQL. 57:15 Database Indexes: Speed up reads by pointing to exact rows. 1:01:06 Free Lab 2: Database Indexes. 1:02:22 Caching: Use Redis for hot data. 1:11:21 Interview Byte 6: Failure-driven design. 1:12:53 Free Lab 3: Caching. 1:13:01 Replication: Primary/Replica for read distribution and failover. 1:19:34 Sharding: Split data across machines. 1:24:03 Free Lab 4: Replication. 1:24:27 Summary: The design we made so far: Load Balancer, Stateless Servers, Redis Cache, Postgres (Primary + 2 Replicas), MongoDB, Sharding.
